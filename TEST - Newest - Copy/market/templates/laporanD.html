@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}
+Market Page
+{% endblock %}
+{% block content %}
+
+<div class="row" style="margin-top:20px; justify-content: center;">
+   <div class="col-11">
+       <h2>LAPORAN DETAILLLLL CAPEEEEE</h2>
+       <!-- <p>Click on one of the items to start buying</p> -->
+       <br>
+      <table class="table table-hover table-dark">
+         <thead>
+            <tr>
+               <!-- Your Columns HERE -->
+               <!-- <th scope="col">ID Transaksi</th> -->
+               <th scope="col">ID barang </th>
+               <th scope="col">qtyPerbrng</th>
+               <th scope="col">Total brng</th>
+            </tr>
+         </thead>
+         <tbody>
+            <!-- Your rows inside the table HERE: -->
+            {% for item in allDetailTrans %}
+            <tr>
+               <!-- <td>{{ item.transID }}</td> -->
+               <td>{{ item.barangID }}</td>
+               <td>{{ item.qtyPerBrng }}</td>
+               <td>Rp. {{ item.totalHargaPerBrng}}</td>
+            </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+   </div>
+</div>
+{% endblock %}

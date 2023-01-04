@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+{% block title %}
+Market Page
+{% endblock %}
+{% block content %}
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<div class="row" style="margin-top:20px; margin-left:20px">
+   <div class="col-4">
+       <h2>Total Price</h2>
+       <br>
+      <table class="table table-hover table-dark" id="myTable">
+         <thead>
+            <tr>
+               <!-- Your Columns HERE -->
+               <th scope="col">Name</th>
+               <th scope="col">qty</th>
+               <th scope="col">harga</th>
+               <th scope="col">Total Harga</th>
+            </tr>
+         </thead>
+         <tbody>
+            <!-- Your rows inside the table HERE: -->
+            {% for item in detected %}
+            <tr>
+               <td>{{ item.nama }}</td>
+               <td id="qty_brg">{{ item.qty }}</td>
+               <td id="harga_brg" >{{ item.harga }}</td>
+               <td id="ttl_hrg">{{ item.qty*item.harga }}</td>
+               <!-- <td>
+                  <button class="btn btn-outline btn-info" data-toggle="modal" data-target="#Modal-MoreInfo-{{ item.id }}">More Info</button>
+                  <button class="btn btn-outline btn-success" data-toggle="modal" data-target="#Modal-PurchaseConfirm-{{ item.id }}">Purchase this Item</button>
+               </td> -->
+            </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+      
+      <!-- <form action="testing.html">
+        <label for="fname">First name:</label><br>
+        <input type="text" id="fname" name="fname" value="John"><br>
+        <label for="lname">Last name:</label><br>
+        <input type="text" id="lname" name="lname" value="Doe"><br><br>
+        <input type="submit" value="Submit">
+      </form> -->
+
+      <table class="table table-hover table-dark">
+        <thead>
+          <tr>
+            <th scope="col">Total Harga</th>
+            <th scope="col"></th>
+            <th scope="col" id="total_harga"></th>
+         </tr>
+        </thead>
+      </table>
+      <!-- <button data-toggle="modal" class="nav-link" onclick="total()" id="btn-hitungTotal">Purchase this Item</button> -->
+      <button data-toggle="modal" class="nav-link" id="btn-hitungTotal">Purchase this Item</button>
+      <button class="nav-link" id="btn-confirm">confirm</button>
+   </div>
+
+   <form action="">
+    <label for="date">Date: </label>
+    <input type="date" id="date">
+    <br>
+    
+    <label for="desc">Description: </label>
+    <input type="text" id="desc">
+    <br>
+    
+    <label for="amount">Amount: </label>
+    <input type="text" id="amount">
+    <br>
+    
+    <input type="button" id="submit" value="Submit">
+    <br>
+</form>
+
+
+   <div class="col-8">
+      <h2>Scan Products</h2>
+        <br>
+        <style>
+         .button-group, .play-area {
+           border: 1px solid grey;
+           padding: 1em 1%;
+           /* margin-bottom: 1em; */
+         }
+          
+         .button {
+           padding: 0.5em;
+           margin-right: 1em;
+         }
+          
+         .play-area-sub {
+           width: 47%;
+           padding: 1em 1%;
+           display: inline-block;
+           text-align: center;
+         }
+          
+         #capture {
+           display: none;
+         }
+          
+         #snapshot {
+           display: inline-flex;
+           width: 320px;
+           height: 240px;
+         }
+         </style>
+         
+         <div class="button-group">
+           <button id="btn-start" type="button" class="button">Start Streaming</button>
+           <button id="btn-stop" type="button" class="button">Stop Streaming</button>
+           <button id="btn-capture" type="button" class="button">Capture Image</button>
+         </div>
+         
+         <div class="play-area">
+           <div class="play-area-sub">
+             <h3>The Stream</h3>
+             <video id="stream" width="320" height="240"></video>
+           </div>
+           <div class="play-area-sub">
+             <h3>The Capture</h3>
+             <canvas id="capture" width="320" height="240"></canvas>
+             <div id="snapshot"></div>
+           </div>
+         </div>
+         
+         
+         <script>
+         //JavaScript
+         
+         // The buttons to start & stop stream and to capture the image
+         var btnStart = document.getElementById( "btn-start" );
+         var btnStop = document.getElementById( "btn-stop" );
+         var btnCapture = document.getElementById( "btn-capture" );
+         var btnHitungTotal = document.getElementById( "btn-hitungTotal" );
+         var btnConfirm = document.getElementById( "btn-confirm" );
+
+         // The stream & capture
+         var stream = document.getElementById( "stream" );
+         var capture = document.getElementById( "capture" );
+         var snapshot = document.getElementById( "snapshot" );
+          
+         // The video stream
+         var cameraStream = null;
+          
+         // Attach listeners
+         btnStart.addEventListener( "click", startStreaming );
+         btnStop.addEventListener( "click", stopStreaming );
+         btnCapture.addEventListener( "click", captureSnapshot );
+         btnHitungTotal.addEventListener("click", hitungTotalHarga )
+         btnConfirm.addEventListener("click", addRows)
+          
+         // Start Streaming
+         function startStreaming() {
+          
+         var mediaSupport = 'mediaDevices' in navigator;
+         if( mediaSupport && null == cameraStream ) {
+            navigator.mediaDevices.getUserMedia( { video: true } )
+            .then( function( mediaStream ) {
+                cameraStream = mediaStream;
+                stream.srcObject = mediaStream;
+                stream.play();
+            })
+            .catch( function( err ) {
+                console.log( "Unable to access camera: " + err );
+            });
+         } else {
+                alert( 'Your browser does not support media devices.' );
+            return;
+            }
+         }
+          
+         // Stop Streaming
+         function stopStreaming() {
+         if( null != cameraStream ) {
+            var track = cameraStream.getTracks()[ 0 ];
+            track.stop();
+            stream.load();
+            cameraStream = null;
+            }
+         }
+         
+         function captureSnapshot() {
+         if( null != cameraStream ) {
+         var ctx = capture.getContext( '2d' );
+         var img = new Image();
+          
+         ctx.drawImage( stream, 0, 0, capture.width, capture.height );
+         img.src = capture.toDataURL( "image/png" );
+         img.width = 360;
+         snapshot.innerHTML = '';
+         snapshot.appendChild( img );
+
+            axios({
+                method: "POST",
+                url: "https://detect.roboflow.com/items-pg4nl/7",
+                params: {
+                    api_key: "JUkO64L0jyCRuMqUO9CW"
+                },
+                data: img.src,
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
+            })
+            .then(function(response) {
+                console.log(response.data);
+                predictions = response.data.predictions;
+                // Looping through data
+                var ul = document.getElementById("product-list");
+                for(let i=0; i< predictions.length; i++){
+                    label = predictions[i].class;
+                    let li = document.createElement("li");
+                    li.appendChild(document.createTextNode(label));
+                    ul.appendChild(li);
+                }
+            })
+            .catch(function(error) {
+                console.log(error.message);
+            });  
+          }
+        }
+
+        //  var harga_val = parseInt(0);
+        //  var qty_brg = parseInt(document.getElementById('qty_brg').innerHTML);
+        //     var harga_brg = document.getElementById('harga_brg').innerHTML;
+        //     var total_harga = parseInt(document.getElementById('ttl_hrg').innerHTML);
+        //     var grand_total = harga_val+total_harga;
+         
+        // function total(){ 
+        //     document.getElementById('total_harga').innerHTML = 0;
+        //     console.log(grand_total)
+        //     return qty_brg;
+        //   }
+
+        // function updateSubTotal() {
+        //   var table = document.getElementById("myTable");
+        //   let subTotal = Array.from(table.rows).slice(1).reduce((total, row) => {
+        //   return total + parseFloat(row.cells[1].innerHTML);
+        //   }, 0);
+        //   document.getElementById("total_harga").innerHTML = subTotal.toFixed(2);
+        // }
+        function hitungTotalHarga() {
+            var table = document.getElementById("myTable");
+            let subTotal = Array.from(table.rows).slice(1).reduce((total, row) => {
+            return total + parseFloat(row.cells[3].innerHTML);
+            }, 0);
+            document.getElementById('total_harga').innerHTML = subTotal.toFixed(0);
+        }
+
+
+          document.getElementById("submit").onclick=function()
+            {
+                document.getElementById("table").style.display="block";
+                
+                var table = document.getElementById("table");
+                var row = table.insertRow(-1);
+                var date = row.insertCell(0);
+                var desc = row.insertCell(1);
+                var amt = row.insertCell(2);
+                date.innerHTML = document.getElementById("date").value;
+                desc.innerHTML = document.getElementById("desc").value;
+                amt.innerHTML = document.getElementById("amount").value;
+                
+                return false;
+            }
+          
+         </script>
+         
+   </div>
+</div>
+{% endblock %}

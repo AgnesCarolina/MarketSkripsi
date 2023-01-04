@@ -5,6 +5,20 @@ Market Page
 {% block content %}
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
+<div>
+  <!-- Create Form with date and number input -->
+  <form action="/testing" method="post">
+    <input type="date" name="tgl">
+    <input type="number" name="total_harga">
+    <input type="submit" value="Submit">
+  </form>
+
+
+
+  <form action="/testing" method="post">
+  </form>
+</div>
+
 <div class="row" style="margin-top:20px; margin-left:20px">
    <div class="col-4">
        <h2>Total Price</h2>
@@ -77,6 +91,10 @@ Market Page
 
 
    <div class="col-8">
+      <h2>List Products</h2>
+      <ul id="product-list">
+      </ul>
+
       <h2>Scan Products</h2>
         <br>
         <style>

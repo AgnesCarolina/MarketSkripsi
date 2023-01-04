@@ -15,18 +15,25 @@ def home_page():
 
 @app.route('/testing', methods=['GET', 'POST'])
 def testing_page():
+    tgl = request.form.get('tgl')
+    total_harga = request.form.get('total_harga')
+    
+    return {'tgl': tgl, 'total_harga': total_harga}
+    
     # terima data yg dibutuhin 
     # untuk page laporan (db.Htrans): total_harga, tgl saat button di klik 
     # untuk page DLaporan (db.dtrans): idBarng, nemabarang, qty, hrg satuan saat button di klik 
     # brng yg ke detect bisa masuk ke tabel
     return render_template('testing.html')
 
+
+
 @app.route('/market', methods=['GET', 'POST'])
 def market_page():
     if request.method == "GET":
         detected = trial.query.all() # ini yg dummy
 
-        sqliteConnection = sqlite3.connect('C:/Users/Agnes/Downloads/Compressed/TEST - Newest - Copy/market/market.db')
+        sqliteConnection = sqlite3.connect('/home/mcimam/PersonalProject/MarketSkripsi/TEST - Newest - Copy/market/market.db')
         cursor = sqliteConnection.cursor()
         # ************* untuk update *******************
         cursor.execute("select namaBarang from dbarang")
@@ -58,7 +65,7 @@ def market_page():
             print(mystring1)
             # print(getstok)
             cursor.execute("""update dbarang set totalStok = ? where barangID = ? """, (int(str(mystring)), int(str(mystring1))))
-            db.session.commit()
+            # db.session.commit()
         sqliteConnection.commit()
         cursor.close()
 

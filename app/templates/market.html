@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% block title %}
+Market Page
+{% endblock %}
+{% block content %}
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+
+<div class="row" style="margin-top:20px; margin-left:20px">
+   <div class="col-4">
+       <h2>Total Price</h2>
+       <br>
+      <table class="table table-hover table-dark" id="myTable">
+         <thead>
+            <tr>
+               <!-- Your Columns HERE -->
+               <th scope="col">Name</th>
+               <th scope="col">qty</th>
+               <th scope="col">harga</th>
+               <th scope="col">Total Harga</th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr>
+               <td></td>
+               <td id="qty_brg"></td>
+               <td id="harga_brg" ></td>
+               <td id="ttl_hrg"></td>
+            </tr>
+         </tbody>
+      </table>
+      
+
+      <table class="table table-hover table-dark">
+        <thead>
+          <tr>
+            <th scope="col">Total Harga</th>
+            <th scope="col" ></th>
+            <th scope="col" id="total_harga"></th>
+         </tr>
+        </thead>
+      </table>
+      <!-- <button data-toggle="modal" class="nav-link" onclick="total()" id="btn-hitungTotal">Purchase this Item</button> -->
+      <button data-toggle="modal" class="nav-link" id="btn-hitungTotal">Purchase this Item</button>
+      <button class="nav-link" id="btn-confirm">confirm</button>
+   </div>
+
+   <div class="col-8">
+      <h2>List Products</h2>
+      <ul id="product-list">
+      </ul>
+
+      <h2>Scan Products</h2>
+        <br>
+        <style>
+         .button-group, .play-area {
+           border: 1px solid grey;
+           padding: 1em 1%;
+           /* margin-bottom: 1em; */
+         }
+          
+         .button {
+           padding: 0.5em;
+           margin-right: 1em;
+         }
+          
+         .play-area-sub {
+           width: 47%;
+           padding: 1em 1%;
+           display: inline-block;
+           text-align: center;
+         }
+          
+         #capture {
+           display: none;
+         }
+          
+         #snapshot {
+           display: inline-flex;
+           width: 320px;
+           height: 240px;
+         }
+         </style>
+         
+         <div class="button-group">
+           <button id="btn-start" type="button" class="button">Start Streaming</button>
+           <button id="btn-stop" type="button" class="button">Stop Streaming</button>
+           <button id="btn-capture" type="button" class="button">Capture Image</button>
+         </div>
+         
+         <div class="play-area">
+           <div class="play-area-sub">
+             <h3>The Stream</h3>
+             <video id="stream" width="320" height="240"></video>
+           </div>
+           <div class="play-area-sub">
+             <h3>The Capture</h3>
+             <canvas id="capture" width="320" height="240"></canvas>
+             <div id="snapshot"></div>
+           </div>
+         </div>
+         
+         
+         <script>
+         //JavaScript
+         
+         // The buttons to start & stop stream and to capture the image
+         var btnStart = document.getElementById( "btn-start" );
+         var btnStop = document.getElementById( "btn-stop" );
+         var btnCapture = document.getElementById( "btn-capture" );
+         var btnHitungTotal = document.getElementById( "btn-hitungTotal" );
+         var btnConfirm = document.getElementById( "btn-confirm" );
+
+         // The stream & capture
+         var stream = document.getElementById( "stream" );
+         var capture = document.getElementById( "capture" );
+         var snapshot = document.getElementById( "snapshot" );
+          
+         // The video stream
+         var cameraStream = null;
+          
+         // Attach listeners
+         btnStart.addEventListener( "click", startStreaming );
+         btnStop.addEventListener( "click", stopStreaming );
+         btnCapture.addEventListener( "click", captureSnapshot );
+         btnHitungTotal.addEventListener("click", hitungTotalHarga )
+         btnConfirm.addEventListener("click", confirmCart )
+        //  btnConfirm.addEventListener("click", addRows)
+
+        // Item Variables 
+        var items = []
+          
+         // Start Streaming
+         function startStreaming() {
+          
+         var mediaSupport = 'mediaDevices' in navigator;
+         if( mediaSupport && null == cameraStream ) {
+            navigator.mediaDevices.getUserMedia( { video: true } )
+            .then( function( mediaStream ) {
+                cameraStream = mediaStream;
+                stream.srcObject = mediaStream;
+                stream.play();
+            })
+            .catch( function( err ) {
+                console.log( "Unable to access camera: " + err );
+            });
+         } else {
+                alert( 'Your browser does not support media devices.' );
+            return;
+            }
+         }
+          
+         // Stop Streaming
+         function stopStreaming() {
+         if( null != cameraStream ) {
+            var track = cameraStream.getTracks()[ 0 ];
+            track.stop();
+            stream.load();
+            cameraStream = null;
+            }
+         }
+         
+         function captureSnapshot() {
+         if( null != cameraStream ) {
+         var ctx = capture.getContext( '2d' );
+         var img = new Image();
+          
+         ctx.drawImage( stream, 0, 0, capture.width, capture.height );
+         img.src = capture.toDataURL( "image/png" );
+         img.width = 360;
+         snapshot.innerHTML = '';
+         snapshot.appendChild( img );
+
+            axios({
+                method: "POST",
+                url: "https://detect.roboflow.com/items-pg4nl/7",
+                params: {
+                    api_key: "JUkO64L0jyCRuMqUO9CW"
+                },
+                data: img.src,
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
+            })
+            .then(function(response) {
+                console.log(response);
+                predictions = response.data.predictions;
+                axios({
+                  method: "POST",
+                  url: "/market/add",
+                  data: {
+                    predictions: predictions
+                  }
+                }).then(function(response) {
+                  // Rerender list
+
+                  // Looping through data
+                  dt = response.data;
+                  loop_preds:
+                  for(let i=0; i< dt.length; i++){
+                    const pred = dt[i];
+                    loop_items:
+                    for (let j = 0; j < items.length; i++) {
+                      const item = items[i];
+                      //  Add qty if id is exist
+                      if(item.id == pred.id){
+                        item.qty += 1;
+                        item.total = item.qty * item.price;
+                        // Skip to next prediction
+                        continue loop_preds;
+                      }
+                    }
+
+                    // add predtion to items if note exist
+                    items.push({
+                      id: pred.id,
+                      name: pred.name,
+                      price: pred.price,
+                      qty: 1,
+                      total: pred.price * 1
+                    });
+
+
+                  }
+
+                  // Rerender Item
+                  $("#myTable").find("tbody").empty();
+                  for(let j =0; j< items.length; j++){
+                    const item = items[j];
+                    data = `<tr><td>${item.name}</td><td>${item.qty}</td><td>${item.price}</td><td>${item.total}</td></tr>`;
+
+                    $("#myTable").find("tbody")
+                    .append(data);
+                  }
+
+                  // Rerender Total
+                  hitungTotalHarga();
+
+                });
+            })
+            .catch(function(error) {
+                console.log(error.message);
+            });  
+          }
+        }
+
+        function hitungTotalHarga() {
+            let el_total = $("#total_harga");
+            let total_harga = 0;
+            for (let i=0; i<items.length; i++){
+              total_harga += items[i].total;
+            }
+            el_total.text(total_harga);
+
+        }
+
+        function confirmCart() {
+          axios({
+            method: "POST",
+            url: "/market/confirm",
+            data: {
+              items: items
+            }
+          }).then(function(response) {
+            console.log("Data Inputed")
+            console.log(response);
+          });
+        }
+
+     
+          
+         </script>
+         
+   </div>
+</div>
+{% endblock %}

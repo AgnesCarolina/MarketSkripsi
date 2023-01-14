@@ -13,24 +13,22 @@ Market Page
          <thead>
             <tr>
                <!-- Your Columns HERE -->
-               <th scope="col">ID Laporan</th>
-               <th scope="col">Tanggal Laporan</th>
-               <th scope="col">Status</th>
-               <!-- <th scope="col">Action </th> -->
+               <th scope="col">ID Transaksi</th>
+               <th scope="col">Tanggal Transaksi</th>
+               <th scope="col">Total Transaksi</th>
+               <th scope="col">Action </th>
             </tr>
          </thead>
          <tbody>
             <!-- Your rows inside the table HERE: -->
-            {% for laporan in allLaporan %}
-            {% include 'includes/items_modals.html' %}
+            {% for item in allLaporan %}
             <tr>
-               <td>{{ laporan.lapID }}</td>
-               <td>{{ laporan.lapDate}}</td>
-               <td>{{ laporan.status}}</td>
+               <td>{{ item.transID }}</td>
+               <td>{{ item.transDate }}</td>
+               <td>Rp. {{ item.totalPayment}}</td>
                <td>
-                <!-- <button class="btn btn-outline btn-info" data-toggle="modal" data-target="#Modal-MoreInfo-{{ item.id }}">Detail</button> -->
-               <!-- <a class="btn btn-primary" href="{{ url_for('laporanD_page') }}">Detail</a> -->
-             </td>
+                  <a href=/detail_laporan/{{item.transID}}>Detail</a>
+              </td>
             </tr>
             {% endfor %}
          </tbody>

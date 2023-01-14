@@ -1,7 +1,11 @@
-from . import db
+from . import db, login_manager
 from app import bcrypt
-# from flask_login import UserMixin
+from flask_login import UserMixin
 from datetime import datetime
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Kasir.query.get(int(user_id))
 
 class DBarang (db.Model):
     barangID = db.Column(db.String(6), primary_key=True, nullable=False)
@@ -42,14 +46,14 @@ class Laporan(db.Model):
     def __repr__(self):
         return f'laporan({self.lapID},{self.lapDate},{self.status})'
 
-class Kasir(db.Model):
+class Kasir(db.Model, UserMixin):
     kasirID = db.Column(db.String(6), primary_key=True, nullable=False)
     kName = db.Column(db.String(50), nullable=False)
     kAddress = db.Column(db.String(50), nullable=False)
     kPhone = db.Column(db.String(16), nullable=False)
     username = db.Column(db.String(length=30), nullable=False, unique=True) #= db.Column(db.String(50), nullable=False)
     email_address = db.Column(db.String(length=50), nullable=False, unique=True)
-    password_hash = db.Column(db.String(length=60), nullable=False)
+    password_hash = db.Column(db.BINARY(length=60), nullable=False)
     
     @property
     def password(self):

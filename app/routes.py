@@ -51,8 +51,10 @@ def add_product():
             class_name = product.get('class')
             if not class_name:
                 continue
-            brng = DBarang.query.filter_by(namaClass=class_name).first()
+            brng = DBarang.query.filter_by(namaClass=class_name).first() #knp first untuk simpen yg diambil dlm bentuk objek 
+            # karena DBarang.query.filter_by(namaClass=class_name) bakal simpen array
             baranglist.append({'id': brng.barangID, 'name': brng.namaBarang, 'price': brng.harga, 'stock': brng.totalStok})
+            #appen tuh buat nambahin
 
         return baranglist
 
@@ -82,6 +84,9 @@ def confirm():
             if brng.totalStok < qty:
                 continue
 
+            # Decrease stock
+            brng.totalStok = brng.totalStok - qty
+
             dtransaksi = DTransaksi(transID = h_id, barangID = pid, qtyPerBrg = qty, totalHargaPerBrg=total)
             total_harga = total_harga + total
             db.session.add(dtransaksi)
@@ -95,43 +100,27 @@ def confirm():
         return "Success"
 
 
-# @app.route ('/laporan', methods=['GET', 'POST'])
-# def laporan_page():
-#     if request.method == "POST":
-#         ht = request.get_json()
-#         lap_id = uuid.uuid4().hex[:6]
-#         laporan = Laporan(lapID = lap_id)
-#         db.session.add(laporan) 
+@app.route ('/laporan', methods=['GET'])
+def laporan_page():
+    allLaporan = HTransaksi.query.all()
+    laporlist = []
+    for lapor in allLaporan:
+        laporlist.append({'transID': lapor.transID, 'totalPayment': lapor.totalPayment, 'transDate': lapor.transDate})
+        
+    return render_template('laporan.html', allLaporan=allLaporan)
 
-#         for lapor in ht.get('transactions'):
-#             lapordate = lapor.get('date')
-#             if not lapordate:
-#                 continue
 
-#             date = HTransaksi.query.filter_by(transDate=lapordate).first()
-#             id = date.transID
-#             toko = date.tokoName
-#             kID = date.kasirID
-#             tp = date.totalPayment 
+@app.route ('/detail_laporan/<string:transID>', methods=['GET'])
+def d_laporan_page(transID):
+    id = HTransaksi.query.filter_by(transID = transID).one()
+    items = DTransaksi.query.filter_by(transID = id.transID)
 
-#             # Check if date is NOT exit
-#             if date.transDate == " ":
-#                 continue
-
-#             htransaksi = HTransaksi(transID = id, tokoName = toko, kasirID = kID, totalPayment = tp, transDate = date)
-#             db.session.add(htransaksi)
-
-#         laporan = Laporan.query.filter_by(lap_id=lap_id).first()
-#         db.session.commit()
-#         return "Success"
-
-#     if request.method == "GET":
-#         allLaporan = Laporan.query.all()
-#         laporlist = []
-#         for lapor in allLaporan:
-#             laporlist.append({'lapID':lapor.lapID, "lapDate":lapor.lapDate, 'status':lapor.status})
-
-#         return render_template('laporan.html', allLaporan=allLaporan)
+    allLdetail = DTransaksi.query.all()
+    dlaporlist = []
+    for Dtrs in allLdetail:
+        dlaporlist.append({'barangID': Dtrs.barangID, 'qtyPerBrg': Dtrs.qtyPerBrg, 'totalHargaPerBrg': Dtrs.totalHargaPerBrg,})
+        
+    return render_template('laporanD.html', id = id, items = items, allLdetail=allLdetail)
 
 
 @app.route('/register', methods=['GET', 'POST'])

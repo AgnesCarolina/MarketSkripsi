@@ -21,12 +21,12 @@ Market Page
          </thead>
          <tbody>
             <!-- Your rows inside the table HERE: -->
-            {% for item in allDetailTrans %}
+            {% for item in allLdetail %}
             <tr>
                <!-- <td>{{ item.transID }}</td> -->
                <td>{{ item.barangID }}</td>
-               <td>{{ item.qtyPerBrng }}</td>
-               <td>Rp. {{ item.totalHargaPerBrng}}</td>
+               <td>{{ item.qtyPerBrg }}</td>
+               <td>Rp. {{ item.totalHargaPerBrg}}</td>
             </tr>
             {% endfor %}
          </tbody>

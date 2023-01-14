@@ -1,5 +1,6 @@
-from . import db
+from . import db, login_manager
 from datetime import datetime
+from flask_login import UserMixin
 
 class DBarang (db.Model):
     barangID = db.Column(db.String(6), primary_key=True, nullable=False)
@@ -40,12 +41,19 @@ class Laporan(db.Model):
     def __repr__(self):
         return f'laporan({self.lapID},{self.lapDate},{self.status})'
 
-class Kasir(db.Model):
-    kasirID = db.Column(db.String(6), primary_key=True, nullable=False)
-    kName = db.Column(db.String(50), nullable=False)
-    kAddress = db.Column(db.String(50), nullable=False)
-    kPhone = db.Column(db.String(16), nullable=False)
-    kEmail = db.Column(db.String(50), nullable=False)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Kasir.query.get((user_id))
+
+class Kasir(db.Model, UserMixin):
+    id = db.Column(db.Integer(), primary_key=True)
+    kasirID = db.Column(db.String(6), nullable=False)
+    kName = db.Column(db.String(50), nullable=True)
+    kAddress = db.Column(db.String(50), nullable=True)
+    kPhone = db.Column(db.String(16), nullable=True)
+    kEmail = db.Column(db.String(50), nullable=True)
+    username = db.Column(db.String(length=30), nullable=False, unique=True)
     email_address = db.Column(db.String(length=50), nullable=False, unique=True)
     password_hash = db.Column(db.String(length=60), nullable=False)
     
@@ -53,6 +61,8 @@ class Kasir(db.Model):
     def password(self):
         return self.password
 
+    def check_password_correction():
+        return True
 
 
 # class hTransToLaporan(db.Model):

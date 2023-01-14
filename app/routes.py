@@ -3,12 +3,34 @@ import functools
 
 from . import app, db
 from .models import DBarang, HTransaksi, DTransaksi, Laporan, Kasir
+from .forms import RegisterForm, LoginForm
+from flask_login import login_user, logout_user, login_required, current_user
+
 import uuid
 import json
 
 @app.route('/')
 def home_page():
     return render_template('home.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login_page():
+    form = LoginForm()
+    if form.validate_on_submit():
+        attempted_user = Kasir.query.filter_by(
+            username=form.username.data).first()
+        if attempted_user:
+            login_user(attempted_user)
+            flash(
+                f'Success! You are logged in as: {attempted_user.username}', category='success')
+            return redirect(url_for('home_page'))
+        else:
+            flash('Username and password are not match! Please try again',
+                  category='danger')
+
+    return render_template('login.html', form=form)
+
 
 @app.route('/item', methods=['GET', 'POST'])
 def item_page():
@@ -36,6 +58,7 @@ def item_page():
 
 
 @app.route('/market', methods=['GET', 'POST'])
+@login_required
 def market_page():
     if request.method == "GET":
         return render_template('market.html', detected=[])

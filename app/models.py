@@ -35,7 +35,7 @@ class DTransaksi(db.Model):
 class Laporan(db.Model):
     lapID = db.Column(db.String(6), primary_key=True, nullable=False)
     lapDate = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
-    status = db.Column(db.String(1), nullable=False, default='A') # A = Printed, I = Not-Printed
+    status = db.Column(db.String(1), nullable=False, default='I') # A = Printed, I = Not-Printed
 
     def __repr__(self):
         return f'laporan({self.lapID},{self.lapDate},{self.status})'
@@ -52,7 +52,6 @@ class Kasir(db.Model):
     @property
     def password(self):
         return self.password
-
 
 
 # class hTransToLaporan(db.Model):

@@ -32,9 +32,6 @@ def item_page():
 
         return "Success"
 
-        
-
-
 @app.route('/market', methods=['GET', 'POST'])
 def market_page():
     if request.method == "GET":
@@ -60,7 +57,7 @@ def add_product():
 @app.route('/market/confirm', methods=['POST'])
 def confirm():
     if request.method == "POST":
-        dt = request.get_json()
+        dt = request.get_json() #ini apa???
         # Get H Transaksi Data
         h_id = uuid.uuid4().hex[:6]
         htransaksi = HTransaksi(transID = h_id)
@@ -95,3 +92,41 @@ def confirm():
 
         return "Success"
 
+
+@app.route ('/laporan', methods=['GET', 'POST'])
+def laporan_page():
+    if request.method == "POST":
+        ht = request.get_json()
+        lap_id = uuid.uuid4().hex[:6]
+        laporan = Laporan(lapID = lap_id)
+        db.session.add(laporan) 
+
+        for lapor in ht.get('transactions'):
+            lapordate = lapor.get('date')
+            if not lapordate:
+                continue
+
+            date = HTransaksi.query.filter_by(transDate=lapordate).first()
+            id = date.transID
+            toko = date.tokoName
+            kID = date.kasirID
+            tp = date.totalPayment 
+
+            # Check if date is NOT exit
+            if date.transDate == " ":
+                continue
+
+            htransaksi = HTransaksi(transID = id, tokoName = toko, kasirID = kID, totalPayment = tp, transDate = date)
+            db.session.add(htransaksi)
+
+        laporan = Laporan.query.filter_by(lap_id=lap_id).first()
+        db.session.commit()
+        return "Success"
+
+    if request.method == "GET":
+        allLaporan = Laporan.query.all()
+        laporlist = []
+        for lapor in allLaporan:
+            laporlist.append({'lapID':lapor.lapID, "lapDate":lapor.lapDate, 'status':lapor.status})
+
+        return render_template('laporan.html', allLaporan=allLaporan)

@@ -40,16 +40,11 @@ Market Page
          </tr>
         </thead>
       </table>
-      <!-- <button data-toggle="modal" class="nav-link" onclick="total()" id="btn-hitungTotal">Purchase this Item</button> -->
-      <button data-toggle="modal" class="nav-link" id="btn-hitungTotal">Purchase this Item</button>
+      <!-- <button data-toggle="modal" class="nav-link" id="btn-hitungTotal">Purchase this Item</button> -->
       <button class="nav-link" id="btn-confirm">confirm</button>
    </div>
 
    <div class="col-8">
-      <h2>List Products</h2>
-      <ul id="product-list">
-      </ul>
-
       <h2>Scan Products</h2>
         <br>
         <style>
@@ -108,7 +103,7 @@ Market Page
          var btnStart = document.getElementById( "btn-start" );
          var btnStop = document.getElementById( "btn-stop" );
          var btnCapture = document.getElementById( "btn-capture" );
-         var btnHitungTotal = document.getElementById( "btn-hitungTotal" );
+        //  var btnHitungTotal = document.getElementById( "btn-hitungTotal" );
          var btnConfirm = document.getElementById( "btn-confirm" );
 
          // The stream & capture
@@ -123,7 +118,7 @@ Market Page
          btnStart.addEventListener( "click", startStreaming );
          btnStop.addEventListener( "click", stopStreaming );
          btnCapture.addEventListener( "click", captureSnapshot );
-         btnHitungTotal.addEventListener("click", hitungTotalHarga )
+        //  btnHitungTotal.addEventListener("click", hitungTotalHarga )
          btnConfirm.addEventListener("click", confirmCart )
         //  btnConfirm.addEventListener("click", addRows)
 
@@ -224,17 +219,17 @@ Market Page
                   }
 
                   // Rerender Item
-                  $("#myTable").find("tbody").empty();
-                  for(let j =0; j< items.length; j++){
-                    const item = items[j];
-                    data = `<tr><td>${item.name}</td><td>${item.qty}</td><td>${item.price}</td><td>${item.total}</td></tr>`;
+                  // $("#myTable").find("tbody").empty();
+                  // for(let j =0; j< items.length; j++){
+                  //   const item = items[j];
+                  //   data = `<tr><td>${item.name}</td><td>${item.qty}</td><td>${item.price}</td><td>${item.total}</td></tr>`;
 
-                    $("#myTable").find("tbody")
-                    .append(data);
-                  }
+                  //   $("#myTable").find("tbody")
+                  //   .append(data);
+                  // }
 
                   // Rerender Total
-                  hitungTotalHarga();
+                  // hitungTotalHarga();
 
                 });
             })

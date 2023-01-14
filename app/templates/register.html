@@ -13,6 +13,15 @@
                 Please Create your Account
             </h1>
             <br>
+            {{ form.kName.label() }}
+            {{ form.kName(class="form-control", placeholder="Full Name") }}
+
+            {{ form.kAddress.label() }}
+            {{ form.kAddress(class="form-control", placeholder="Home Address") }}
+
+            {{ form.kPhone.label() }}
+            {{ form.kPhone(class="form-control", placeholder="Phone Number") }}
+
             {{ form.username.label() }}
             {{ form.username(class="form-control", placeholder="User Name") }}
 

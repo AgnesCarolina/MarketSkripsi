@@ -1,11 +1,34 @@
 from . import db, login_manager
-from app import bcrypt
 from flask_login import UserMixin
 from datetime import datetime
 
 @login_manager.user_loader
 def load_user(user_id):
-    return Kasir.query.get(int(user_id))
+    return Kasir.query.get((user_id))
+
+class Kasir(db.Model, UserMixin):
+    id = db.Column(db.Integer(), primary_key=True)
+    kasirID = db.Column(db.String(6), nullable=False)
+    kName = db.Column(db.String(50), nullable=True)
+    kAddress = db.Column(db.String(50), nullable=True)
+    kPhone = db.Column(db.String(16), nullable=True)
+    username = db.Column(db.String(length=30), nullable=False, unique=True) #= db.Column(db.String(50), nullable=False)
+    email_address = db.Column(db.String(length=50), nullable=False, unique=True)
+    password_hash = db.Column(db.BINARY(length=60), nullable=False)
+    
+    @property
+    def password(self):
+        return self.password
+
+    @password.setter
+    def check_password_correction():
+	    return True
+    # def password(self, plain_text_password):
+    #     self.password_hash = bcrypt.generate_password_hash(plain_text_password).decode('utf-8')
+
+    # def check_password_correction(self, attempted_password):
+    #     return bcrypt.check_password_hash(self.password_hash, attempted_password)
+
 
 class DBarang (db.Model):
     barangID = db.Column(db.String(6), primary_key=True, nullable=False)
@@ -45,27 +68,6 @@ class Laporan(db.Model):
 
     def __repr__(self):
         return f'laporan({self.lapID},{self.lapDate},{self.status})'
-
-class Kasir(db.Model, UserMixin):
-    kasirID = db.Column(db.String(6), primary_key=True, nullable=False)
-    kName = db.Column(db.String(50), nullable=False)
-    kAddress = db.Column(db.String(50), nullable=False)
-    kPhone = db.Column(db.String(16), nullable=False)
-    username = db.Column(db.String(length=30), nullable=False, unique=True) #= db.Column(db.String(50), nullable=False)
-    email_address = db.Column(db.String(length=50), nullable=False, unique=True)
-    password_hash = db.Column(db.BINARY(length=60), nullable=False)
-    
-    @property
-    def password(self):
-        return self.password
-
-    @password.setter
-    def password(self, plain_text_password):
-        self.password_hash = bcrypt.generate_password_hash(plain_text_password).decode('utf-8')
-
-    def check_password_correction(self, attempted_password):
-        return bcrypt.check_password_hash(self.password_hash, attempted_password)
-
 
 # class hTransToLaporan(db.Model):
 #     lapID = db.Column(db.String(6), db.ForeignKey('laporan.lapID'), nullable=False)

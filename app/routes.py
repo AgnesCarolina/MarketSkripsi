@@ -36,7 +36,6 @@ def item_page():
 @app.route('/market', methods=['GET', 'POST'])
 def market_page():
     if request.method == "GET":
-        # flash("Laoding...", category='info')
         return render_template('market.html', detected=[])
 
 @app.route('/market/add',methods=['POST'])
@@ -96,6 +95,7 @@ def confirm():
         
         # db.session.merge(htransaksi)
         db.session.commit()
+        flash("success!", category='info')
 
         return "Success"
 
@@ -168,4 +168,4 @@ def login_page():
 def logout_page():
     logout_user()
     flash("You have been logged out!", category='info')
-    return redirect(url_for("home_page"))
+    return redirect(url_for("login_page"))

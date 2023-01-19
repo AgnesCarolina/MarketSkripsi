@@ -189,11 +189,14 @@ Market Page
                   }
                 }).then(function(response) {
                   // Rerender list
+                    
+                    // var ul = document.getElementById("product-list");
+
 
                   // Looping through data
                   dt = response.data;
                   loop_preds:
-                  for(let i=0; i< dt.length; i++){
+                  for(let i=0; i< dt.length; i++){                  
                     const pred = dt[i];
                     loop_items:
                     for (let j = 0; j < items.length; i++) {

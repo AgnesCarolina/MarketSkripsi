@@ -50,10 +50,8 @@ def add_product():
             class_name = product.get('class')
             if not class_name:
                 continue
-            brng = DBarang.query.filter_by(namaClass=class_name).first() #knp first untuk simpen yg diambil dlm bentuk objek 
-            # karena DBarang.query.filter_by(namaClass=class_name) bakal simpen array
+            brng = DBarang.query.filter_by(namaClass=class_name).first()
             baranglist.append({'id': brng.barangID, 'name': brng.namaBarang, 'price': brng.harga, 'stock': brng.totalStok})
-            #appen tuh buat nambahin
 
         return baranglist
 
